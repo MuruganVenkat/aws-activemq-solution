@@ -1,0 +1,23 @@
+# Ignore everything by default
+*
+!*/
+
+# Allow specific directories
+!src/**
+!infrastructure/**
+!.gitignore
+!*.md
+
+# .NET excludes (re-add these to ensure we don't commit bin/obj even in allowed dirs)
+src/**/bin/
+src/**/obj/
+.vs/
+*.user
+*.suo
+
+# Terraform excludes
+infrastructure/.terraform/
+*.tfstate
+*.tfstate.backup
+.terraform.lock.hcl
+*.tfvars

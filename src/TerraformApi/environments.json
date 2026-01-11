@@ -1,0 +1,12 @@
+{
+  "Environments": {
+    "dev": {
+      "WorkingDirectory": "C:/Users/Gitan/OneDrive/Desktop/San/infrastructure",
+      "VarFile": "dev.tfvars"
+    },
+    "prod": {
+      "WorkingDirectory": "C:/Users/Gitan/OneDrive/Desktop/San/infrastructure",
+      "VarFile": "prod.tfvars"
+    }
+  }
+}
