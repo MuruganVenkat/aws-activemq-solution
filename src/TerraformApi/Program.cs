@@ -1,3 +1,4 @@
+using Amazon.SecretsManager;
 using TerraformApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,9 @@ builder.Services.AddSwaggerGen();
 
 // Load environments.json
 builder.Configuration.AddJsonFile("environments.json", optional: false, reloadOnChange: true);
+
+// Register AWS Secrets Manager (uses default credential chain)
+builder.Services.AddAWSService<IAmazonSecretsManager>();
 
 // Register TerraformService
 builder.Services.AddScoped<TerraformService>();

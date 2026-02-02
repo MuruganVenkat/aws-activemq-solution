@@ -26,14 +26,21 @@ resource "aws_secretsmanager_secret_version" "mq_credentials_val" {
 # I will define the SSM parameter resource here but reference the broker from main.tf.
 # However, since they are separate files, Terraform loads them all. Reference is fine.
 
-resource "aws_ssm_parameter" "mq_endpoints_wss" {
-  name        = "/${var.broker_name}/endpoints/wss"
-  description = "List of WSS endpoints for ActiveMQ"
-  type        = "StringList"
-  value       = join(",", [for i in aws_mq_broker.activemq.instances : i.endpoints[0]]) 
-  # Note: 0 is usually OpenWire or WSS depending on output order, need secure parsing in main.tf preferably.
-  # For robustness, we will perform the specific 'value' assignment in main.tf or using a local. 
-  # Let's keep the resource definition but set value to a placeholder if specific logic is needed, 
-  # or move this to main.tf to keep logic close to the source. 
-  # I'll move the complex SSM logic to main.tf to avoid confusion and keep secrets.tf for pure secrets.
+# 3. AWS Secrets Manager: Store OpenWire SSL Endpoints
+# This allows applications to discover OpenWire SSL endpoints for both active and standby brokers.
+
+resource "aws_secretsmanager_secret" "mq_openwire_endpoints" {
+  name        = "/${var.broker_name}/endpoints/openwire-ssl"
+  description = "OpenWire SSL endpoints for ActiveMQ (active and standby)"
+}
+
+resource "aws_secretsmanager_secret_version" "mq_openwire_endpoints_val" {
+  secret_id = aws_secretsmanager_secret.mq_openwire_endpoints.id
+  
+  # Use locals from outputs.tf to get filtered OpenWire SSL URLs
+  secret_string = jsonencode({
+    active_url  = length(local.openwire_ssl_urls) > 0 ? local.openwire_ssl_urls[0] : ""
+    standby_url = length(local.openwire_ssl_urls) > 1 ? local.openwire_ssl_urls[1] : ""
+    all_urls    = local.openwire_ssl_urls
+  })
 }
